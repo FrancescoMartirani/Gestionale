@@ -17,6 +17,75 @@ namespace Gestionale
             ConnectionString = connectionString;
         }
 
+        public List <Persona> GetStudentsNameByMatricola(int matricola)
+        {
+
+            var sql = @"
+                    SELECT [Name]
+                          ,[Surname]
+                      FROM [dbo].[Person]
+                        JOIN [dbo].[Student] ON [dbo].[Student].IdPerson = [dbo].[Person].Id
+                    WHERE [Matricola] = "+matricola;
+
+            var listResult = new List<Persona>();
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+
+
+                Persona person = new Persona
+                {
+
+                    Name = reader["Name"].ToString(),
+                    Surname = reader["Surname"].ToString(),
+
+                };
+
+                listResult.Add(person);
+            }
+
+            return listResult;
+
+        }
+
+        public List<Persona> GetTeachersNameByMatricola(int matricola)
+        {
+
+            var sql = @"
+                    SELECT [Name]
+                          ,[Surname]
+                      FROM [dbo].[Person]
+                        JOIN [dbo].[Teacher] ON [dbo].[Teacher].IdPerson = [dbo].[Person].Id
+                    WHERE [Matricola] = " + matricola;
+
+            var listResult = new List<Persona>();
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+
+
+                Persona person = new Persona
+                {
+
+                    Name = reader["Name"].ToString(),
+                    Surname = reader["Surname"].ToString(),
+
+                };
+
+                listResult.Add(person);
+            }
+
+            return listResult;
+
+        }
         public List <Persona> GetPeople()
         {
 

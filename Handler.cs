@@ -19,6 +19,20 @@ namespace Gestionale
             return listPerson;
         }
 
+        public List<Persona> GetNomiStudentiConMatricola(int matricola)
+        {
+            var persister = new Persister(connectionString);
+            var listPerson = persister.GetStudentsNameByMatricola(matricola);
+            return listPerson;
+        }
+
+        public List<Persona> GetNomiInsegnantiConMatricola(int matricola)
+        {
+            var persister = new Persister(connectionString);
+            var listPerson = persister.GetTeachersNameByMatricola(matricola);
+            return listPerson;
+        }
+
         public bool InserisciUnaPersona(DateTime birthday, string gender, string name, string surname, string address)
         {
             var person = new Persona
@@ -47,8 +61,6 @@ namespace Gestionale
                 Address = address
 
             };
-
-
 
             var student = new Studente
             {
