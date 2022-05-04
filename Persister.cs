@@ -185,6 +185,39 @@ namespace Gestionale
             return idteacher;
         }
 
+        public int GetIdStudentByMatricola(int matricola)
+        {
+
+            var sql = @"
+                    SELECT [IdStudente]
+                      FROM [dbo].[Student]
+                       WHERE [Matricola] =" + matricola;
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var idstudent = Convert.ToInt32(command.ExecuteScalar());
+
+            return idstudent;
+        }
+
+        public int GetIdExamByDateAndName(DateTime dataesame, string nomemateriaesame)
+        {
+
+            var sql = @"
+                    SELECT [IdExam]
+                      FROM [dbo].[Exam]
+                       JOIN [Subject] ON [Subject].[IdSubject] = [Exam].[IdSubject]
+                       WHERE [Exam].[Date] ='" + dataesame + "'AND [Subject].[Name]='"+nomemateriaesame+"'";
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var idesame = Convert.ToInt32(command.ExecuteScalar());
+
+            return idesame;
+        }
+
         public int GetIdSubjectsBySubjectsName(string nomemateria)
         {
 
@@ -285,5 +318,60 @@ namespace Gestionale
             return command.ExecuteNonQuery() > 0;
         }
 
+
+        public bool AddExamDetails(EsameDettaglio esamedettaglio)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[ExamDetail]
+                                   ([IdStudent]
+                                   ,[IdExam])
+                             VALUES
+                                   (@IdStudent
+                                   ,@IdExam)";
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            
+            command.Parameters.AddWithValue("@IdStudent", esamedettaglio.IdStudente);
+            command.Parameters.AddWithValue("@IdExam", esamedettaglio.IdEsame);
+
+            return command.ExecuteNonQuery() > 0;
+        }
+
+        public bool AddVoto(int matricola, int voto)
+        {
+
+            var sql = @"
+                            UPDATE [dbo].[ExamDetail]
+                             SET [Voto] = @Voto
+                            WHERE [ExamDetail].[IdStudent] =" + this.GetIdStudentByMatricola(matricola);
+                            ;
+
+            var sql2 = @"SELECT [ExamDetail].[Voto]
+ FROM [dbo].[ExamDetail]
+JOIN [Student] ON [Student].[IdStudente] = [ExamDetail].[IdStudent]
+JOIN [Exam] ON [Exam].[IdExam] = [ExamDetail].[IdExam]
+WHERE [ExamDetail].[IdStudent] = 10 AND [ExamDetail].[Voto] IS NULL AND [Exam].[Date] <= CURRENT_TIMESTAMP";
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            using var command2 = new SqlCommand(sql2, connection);
+            var result = 0;
+
+            if (command2.ExecuteNonQuery() > 0)
+            {
+
+                command.Parameters.AddWithValue("@Voto", voto);
+                result = command.ExecuteNonQuery();
+
+            }
+
+            return result>0;
+        }
     }
 }

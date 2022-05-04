@@ -33,6 +33,13 @@ namespace Gestionale
             return result;
         }
 
+        public int GetIdEsameConDataENome(DateTime data, string nomemateria)
+        {
+            var persister = new Persister(connectionString);
+            var result = persister.GetIdExamByDateAndName(data, nomemateria);
+            return result;
+        }
+
         public bool InserisciUnaPersona(DateTime birthday, string gender, string name, string surname, string address)
         {
             var person = new Persona
@@ -137,5 +144,33 @@ namespace Gestionale
 
         }
 
+        public bool InserisciDettagliEsame(int matricolastudente, int idesame)
+        {
+
+            var persister = new Persister(connectionString);
+            var idstudente= persister.GetIdStudentByMatricola(matricolastudente);
+
+            var esamedettaglio = new EsameDettaglio
+            {
+
+                IdStudente = idstudente,
+                IdEsame = idesame
+
+            };
+
+
+            return persister.AddExamDetails(esamedettaglio);
+
+        }
+
+        public bool AggiungiVoto(int matricolastudente, int voto)
+        {
+
+            var persister = new Persister(connectionString);
+
+
+            return persister.AddVoto(matricolastudente, voto);
+
+        }
     }
 }
