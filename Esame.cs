@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace Gestionale
 {
-    internal class Esame
+    public class Esame
     {
+
+        public int IdEsame { get; set; }
+        public int IdInsegnante { get; set; }
+        public DateTime Data { get; set; }
+        public int IdMateria { get; set; }
+
     }
 }

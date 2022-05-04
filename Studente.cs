@@ -6,23 +6,13 @@ using System.Text;
 
 namespace Gestionale
 {
-    public class Studente
+    public class Studente : Persona
     {
 
-        public int IdStudent;
-        public int IdPerson;
-        public int Matricola;
-        public DateTime DataIscrizione;
-
-        public Studente(int idstudent, int idperson, int matricola, DateTime dataiscrizione)
-        {
-
-            IdStudent = idstudent;
-            IdPerson = idperson;
-            Matricola = matricola;
-            DataIscrizione = dataiscrizione;
-
-        }
+        public int IdStudent { get; set; }
+        public int IdPerson { get; set; }
+        public int Matricola { get; set; }
+        public DateTime DataIscrizione { get; set; }
 
     }
 }

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Gestionale
 {
-    internal class Classe
+    public class Classe
     {
+        public int IdClasse { get; set; }
+        public int IdStudente { get; set; }
+        public int IdLezione { get; set; }
+
     }
 }

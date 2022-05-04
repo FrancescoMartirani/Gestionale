@@ -17,18 +17,5 @@ namespace Gestionale
          public DateTime Birthday { get; set; }
          public string Address { get; set; }
 
-        public Persona(int id, string name, string surname, string gender, DateTime birthday, string address)
-        {
-
-            Id = id;
-            Name = name;
-            Surname = surname;
-            Gender = gender;
-            Birthday = birthday;
-            Address = address;
-           
-
-        }
-
     }
 }
