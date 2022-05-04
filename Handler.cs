@@ -116,18 +116,24 @@ namespace Gestionale
 
         }
 
-        public bool InserisciUnEsame(DateTime giornoesame, int matricolainsegnante, Materia materia)
+        public bool InserisciUnEsame(DateTime giornoesame, int matricolainsegnante, string nomemateria)
         {
+
+            var persister = new Persister(connectionString);
+            var idinsegnante = persister.GetIdTeachersByMatricola(matricolainsegnante);
+            var idmateria = persister.GetIdSubjectsBySubjectsName(nomemateria);
 
             var esame = new Esame
             {
-               
+
+                IdInsegnante = idinsegnante,
+                IdMateria = idmateria,
                 Data = giornoesame
 
             };
 
-            var persister = new Persister(connectionString);
-            return persister.AddSubject(materia);
+            
+            return persister.AddExam(esame);
 
         }
 

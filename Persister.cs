@@ -169,6 +169,38 @@ namespace Gestionale
             return command.ExecuteNonQuery() > 0;
         }
 
+        public int GetIdTeachersByMatricola(int matricola)
+        {
+
+            var sql = @"
+                    SELECT [IdTeacher]
+                      FROM [dbo].[Teacher]
+                       WHERE [Matricola] ="+matricola;
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var idteacher = Convert.ToInt32(command.ExecuteScalar());
+
+            return idteacher;
+        }
+
+        public int GetIdSubjectsBySubjectsName(string nomemateria)
+        {
+
+            var sql = @"
+                    SELECT [IdSubject]
+                      FROM [dbo].[Subject]
+                       WHERE [Name] ='"+nomemateria+"'";
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var idsubject = Convert.ToInt32(command.ExecuteScalar());
+
+            return idsubject;
+        }
+
         public bool AddTeacher(Insegnante insegnante)
         {
 
@@ -224,6 +256,31 @@ namespace Gestionale
             command.Parameters.AddWithValue("@Descrizione", materia.Descrizione);
             command.Parameters.AddWithValue("@Crediti", materia.Crediti);
             command.Parameters.AddWithValue("@Ore", materia.Ore);
+
+            return command.ExecuteNonQuery() > 0;
+        }
+
+        public bool AddExam(Esame esame)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[Exam]
+                                   ([Date]
+                                    ,[IdTeacher]
+                                   ,[IdSubject])
+                             VALUES
+                                   (@Data
+                                   ,@IdInsegnante
+                                   ,@IdMateria)";
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@Data", esame.Data);
+            command.Parameters.AddWithValue("@IdInsegnante", esame.IdInsegnante);
+            command.Parameters.AddWithValue("@IdMateria", esame.IdMateria);
 
             return command.ExecuteNonQuery() > 0;
         }
