@@ -20,6 +20,13 @@ namespace Gestionale
         public List <Persona> GetPeople()
         {
 
+            var id = 0;
+            var name = "";
+            var surname = "";
+            var gender = "";
+            DateTime birthday = DateTime.Now;
+            var address = "";
+
             var sql = @"
                     SELECT [Id]
                           ,[Name]
@@ -27,7 +34,7 @@ namespace Gestionale
                           ,[BirthDay]
                           ,[Gender]
                           ,[Address]
-                      FROM [dbo].[Person]";
+                      FROM [dbo].[Persons]";
 
             var listResult = new List<Persona>();
 
@@ -37,16 +44,14 @@ namespace Gestionale
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var person = new Persona
-                {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    Name = reader["Name"].ToString(),
-                    Surname = reader["Surname"].ToString(),
-                    Gender = reader["Gender"].ToString(),
-                    Birthday = Convert.ToDateTime(reader["Birthday"]),
-                    Address = reader["Address"].ToString()
+                id = Convert.ToInt32(reader["Id"]);
+                name = reader["Name"].ToString();
+                surname = reader["Surname"].ToString();
+                gender = reader["Gender"].ToString();
+                birthday = Convert.ToDateTime(reader["Birthday"]);
+                address = reader["Address"].ToString();
 
-                };
+                Persona person = new Persona(id, name, surname,gender,birthday,address);
 
                 listResult.Add(person);
             }
