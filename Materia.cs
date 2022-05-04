@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace Gestionale
 {
-    internal class Materia
+    public class Materia
     {
+
+        public int IdMateria { get; set; }
+        public string NomeMateria { get; set; }
+        public string Descrizione { get; set; }
+        public int Crediti { get; set; }
+        public int Ore { get; set; }
+
+
     }
 }
