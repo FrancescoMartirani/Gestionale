@@ -17,7 +17,7 @@ namespace Gestionale
             ConnectionString = connectionString;
         }
 
-        public List <Persona> GetStudentsNameByMatricola(int matricola)
+        public String GetStudentsNameByMatricola(int matricola)
         {
 
             var sql = @"
@@ -27,7 +27,7 @@ namespace Gestionale
                         JOIN [dbo].[Student] ON [dbo].[Student].IdPerson = [dbo].[Person].Id
                     WHERE [Matricola] = "+matricola;
 
-            var listResult = new List<Persona>();
+            var result = new String("");
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
@@ -37,22 +37,15 @@ namespace Gestionale
             {
 
 
-                Persona person = new Persona
-                {
+                result = reader["Name"].ToString() + reader["Surname"].ToString();
 
-                    Name = reader["Name"].ToString(),
-                    Surname = reader["Surname"].ToString(),
-
-                };
-
-                listResult.Add(person);
             }
 
-            return listResult;
+            return result;
 
         }
 
-        public List<Persona> GetTeachersNameByMatricola(int matricola)
+        public string GetTeachersNameByMatricola(int matricola)
         {
 
             var sql = @"
@@ -62,7 +55,7 @@ namespace Gestionale
                         JOIN [dbo].[Teacher] ON [dbo].[Teacher].IdPerson = [dbo].[Person].Id
                     WHERE [Matricola] = " + matricola;
 
-            var listResult = new List<Persona>();
+            var result = new String("");
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
@@ -71,19 +64,11 @@ namespace Gestionale
             while (reader.Read())
             {
 
+                result = reader["Name"].ToString() + reader["Surname"].ToString();
 
-                Persona person = new Persona
-                {
-
-                    Name = reader["Name"].ToString(),
-                    Surname = reader["Surname"].ToString(),
-
-                };
-
-                listResult.Add(person);
             }
 
-            return listResult;
+            return result;
 
         }
         public List <Persona> GetPeople()
@@ -212,6 +197,34 @@ namespace Gestionale
             command.Parameters.AddWithValue("@Matricola", insegnante.Matricola);
             command.Parameters.AddWithValue("@IdPerson", idperson);
             command.Parameters.AddWithValue("@DataAssunzione", insegnante.DataAssunzione);
+            return command.ExecuteNonQuery() > 0;
+        }
+
+        public bool AddSubject(Materia materia)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[Subject]
+                                   ([Name]
+                                    ,[Description]
+                                   ,[Credits]
+                                    ,[Hours])
+                             VALUES
+                                   (@NomeMateria
+                                   ,@Descrizione
+                                   ,@Crediti
+                                    ,@Ore)";
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@NomeMateria", materia.NomeMateria);
+            command.Parameters.AddWithValue("@Descrizione", materia.Descrizione);
+            command.Parameters.AddWithValue("@Crediti", materia.Crediti);
+            command.Parameters.AddWithValue("@Ore", materia.Ore);
+
             return command.ExecuteNonQuery() > 0;
         }
 

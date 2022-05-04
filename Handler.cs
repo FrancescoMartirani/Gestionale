@@ -19,18 +19,18 @@ namespace Gestionale
             return listPerson;
         }
 
-        public List<Persona> GetNomiStudentiConMatricola(int matricola)
+        public String GetNomeStudenteConMatricola(int matricola)
         {
             var persister = new Persister(connectionString);
-            var listPerson = persister.GetStudentsNameByMatricola(matricola);
-            return listPerson;
+            var result = persister.GetStudentsNameByMatricola(matricola);
+            return result;
         }
 
-        public List<Persona> GetNomiInsegnantiConMatricola(int matricola)
+        public String GetNomeInsegnanteConMatricola(int matricola)
         {
             var persister = new Persister(connectionString);
-            var listPerson = persister.GetTeachersNameByMatricola(matricola);
-            return listPerson;
+            var result = persister.GetTeachersNameByMatricola(matricola);
+            return result;
         }
 
         public bool InserisciUnaPersona(DateTime birthday, string gender, string name, string surname, string address)
@@ -97,6 +97,37 @@ namespace Gestionale
 
             var persister = new Persister(connectionString);
             return persister.AddPerson(person) && persister.AddTeacher(teacher);
+
+        }
+
+        public bool InserisciUnaMateria(string nomemateria, string descrizione, int crediti, int ore)
+        {
+            var materia = new Materia
+            {
+                NomeMateria = nomemateria,
+                Descrizione = descrizione,
+                Crediti = crediti,
+                Ore = ore
+
+            };
+
+            var persister = new Persister(connectionString);
+            return persister.AddSubject(materia);
+
+        }
+
+        public bool InserisciUnEsame(DateTime giornoesame, int matricolainsegnante, Materia materia)
+        {
+
+            var esame = new Esame
+            {
+               
+                Data = giornoesame
+
+            };
+
+            var persister = new Persister(connectionString);
+            return persister.AddSubject(materia);
 
         }
 
