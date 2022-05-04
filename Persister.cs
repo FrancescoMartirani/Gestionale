@@ -57,52 +57,21 @@ namespace Gestionale
             return listResult;
         }
 
-        public List<Studente> GetStudents()
-        {
-
-            var sql = @"
-                    SELECT [IdStudente]
-                          ,[IdPerson]
-                          ,[Matricola]
-                          ,[DataIscrizione]
-                      FROM [dbo].[Student]";
-
-            var listResult = new List<Studente>();
-
-            using var connection = new SqlConnection(ConnectionString);
-            connection.Open();
-            using var command = new SqlCommand(sql, connection);
-            var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-
-
-                Studente student = new Studente
-                {
-
-       
-
-                };
-
-                listResult.Add(student);
-            }
-
-            return listResult;
-        }
-
-        public bool Add(Persona person)
+        public bool AddPerson(Persona person)
         {
             var sql = @"
                         INSERT INTO [dbo].[Person]
                                    ([Name]
                                    ,[Surname]
                                    ,[BirthDay]
-                                   ,[Gender])
+                                   ,[Gender]
+                                   ,[Address])
                              VALUES
                                    (@Name
                                    ,@Surname
                                    ,@BirthDay
-                                   ,@Gender)";
+                                   ,@Gender
+                                   ,@Address)";
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
@@ -111,6 +80,69 @@ namespace Gestionale
             command.Parameters.AddWithValue("@Surname", person.Surname);
             command.Parameters.AddWithValue("@BirthDay", person.Birthday);
             command.Parameters.AddWithValue("@Gender", person.Gender);
+            command.Parameters.AddWithValue("@Address", person.Address);
+            return command.ExecuteNonQuery() > 0;
+        }
+
+        public bool AddStudent(Studente studente)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[Student]
+                                   ([Matricola]
+                                    ,[IdPerson]
+                                   ,[DataIscrizione])
+                             VALUES
+                                   (@Matricola
+                                   ,@IdPerson
+                                   ,@DataIscrizione)";
+
+            var sql2 = @"
+                    SELECT MAX([Id])
+                      FROM [dbo].[Person]";
+
+            
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            using var command2 = new SqlCommand(sql2, connection);
+            var idperson = Convert.ToInt32(command2.ExecuteScalar());
+
+            command.Parameters.AddWithValue("@Matricola", studente.Matricola);
+            command.Parameters.AddWithValue("@IdPerson", idperson);
+            command.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
+            return command.ExecuteNonQuery() > 0;
+        }
+
+        public bool AddTeacher(Insegnante insegnante)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[Teacher]
+                                   ([Matricola]
+                                    ,[IdPerson]
+                                   ,[DataAssunzione])
+                             VALUES
+                                   (@Matricola
+                                   ,@IdPerson
+                                   ,@DataAssunzione)";
+
+            var sql2 = @"
+                    SELECT MAX([Id])
+                      FROM [dbo].[Person]";
+
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            using var command2 = new SqlCommand(sql2, connection);
+            var idperson = Convert.ToInt32(command2.ExecuteScalar());
+
+            command.Parameters.AddWithValue("@Matricola", insegnante.Matricola);
+            command.Parameters.AddWithValue("@IdPerson", idperson);
+            command.Parameters.AddWithValue("@DataAssunzione", insegnante.DataAssunzione);
             return command.ExecuteNonQuery() > 0;
         }
 

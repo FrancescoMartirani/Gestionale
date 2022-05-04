@@ -10,7 +10,6 @@ namespace Gestionale
     {
 
         public int IdStudent { get; set; }
-        public int IdPerson { get; set; }
         public int Matricola { get; set; }
         public DateTime DataIscrizione { get; set; }
 
