@@ -10,7 +10,7 @@ namespace Gestionale
     public class Handler
     {
 
-        private readonly string connectionString = "Server=.;Database=Gestionale;Trusted_Connection=True;";
+        private readonly string connectionString = "Server=ACADEMYNETPD01\\SQLEXPRESS;Database=Gestionale;Trusted_Connection=True;";
 
         public List<Persona> GetPersone()
         {

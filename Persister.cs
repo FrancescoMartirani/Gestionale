@@ -57,6 +57,39 @@ namespace Gestionale
             return listResult;
         }
 
+        public List<Studente> GetStudents()
+        {
+
+            var sql = @"
+                    SELECT [IdStudente]
+                          ,[IdPerson]
+                          ,[Matricola]
+                          ,[DataIscrizione]
+                      FROM [dbo].[Student]";
+
+            var listResult = new List<Studente>();
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+
+
+                Studente student = new Studente
+                {
+
+       
+
+                };
+
+                listResult.Add(student);
+            }
+
+            return listResult;
+        }
+
         public bool Add(Persona person)
         {
             var sql = @"
