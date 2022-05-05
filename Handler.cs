@@ -40,115 +40,66 @@ namespace Gestionale
             return result;
         }
 
-        public bool InserisciUnaPersona(DateTime birthday, string gender, string name, string surname, string address)
+        public bool InserisciUnaPersona(Persona persona)
         {
-            var person = new Persona
-            {
-                Birthday = birthday,
-                Gender = gender,
-                Name = name,
-                Surname = surname,
-                Address = address
-
-            };
 
             var persister = new Persister(connectionString);
-            return persister.AddPerson(person);
+            return persister.AddPerson(persona);
 
         }
 
-        public bool InserisciUnoStudente(DateTime birthday, string gender, string name, string surname, string address, int matricola, DateTime dataiscrizione)
+        public bool InserisciUnoStudente(Studente studente)
         {
-            var person = new Persona
-            {
-                Birthday = birthday,
-                Gender = gender,
-                Name = name,
-                Surname = surname,
-                Address = address
-
-            };
-
-            var student = new Studente
-            {
-                Matricola = matricola,
-                DataIscrizione = dataiscrizione,
-
-            };
+            
 
             var persister = new Persister(connectionString);
-            return persister.AddPerson(person) && persister.AddStudent(student);
+            return persister.AddPerson(studente) && persister.AddStudent(studente);
 
         }
 
-        public bool InserisciUnInsegnante(DateTime birthday, string gender, string name, string surname, string address, int matricola, DateTime dataassunzione)
+        public bool InserisciUnInsegnante(Insegnante insegnante)
         {
-            var person = new Persona
-            {
-                Birthday = birthday,
-                Gender = gender,
-                Name = name,
-                Surname = surname,
-                Address = address
-
-            };
-
-
-
-            var teacher = new Insegnante
-            {
-                Matricola = matricola,
-                DataAssunzione = dataassunzione,
-
-            };
 
             var persister = new Persister(connectionString);
-            return persister.AddPerson(person) && persister.AddTeacher(teacher);
+            return persister.AddPerson(insegnante) && persister.AddTeacher(insegnante);
 
         }
 
-        public bool InserisciUnaMateria(string nomemateria, string descrizione, int crediti, int ore)
+        public bool InserisciUnaMateria(Materia materia)
         {
-            var materia = new Materia
-            {
-                NomeMateria = nomemateria,
-                Descrizione = descrizione,
-                Crediti = crediti,
-                Ore = ore
-
-            };
+            
 
             var persister = new Persister(connectionString);
             return persister.AddSubject(materia);
 
         }
 
-        public bool InserisciUnEsame(DateTime giornoesame, int matricolainsegnante, string nomemateria)
+        public bool InserisciUnEsame(Esame esame, Insegnante insegnante, Materia materia)
         {
 
             var persister = new Persister(connectionString);
-            var idinsegnante = persister.GetIdTeachersByMatricola(matricolainsegnante);
-            var idmateria = persister.GetIdSubjectsBySubjectsName(nomemateria);
+            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
 
-            var esame = new Esame
+            var esamedainserire = new Esame
             {
 
                 IdInsegnante = idinsegnante,
                 IdMateria = idmateria,
-                Data = giornoesame
+                Data = esame.Data
 
             };
 
             
-            return persister.AddExam(esame);
+            return persister.AddExam(esamedainserire);
 
         }
 
-        public bool InserisciDettagliEsame(int matricolastudente, int idesame)
+        public bool InserisciDettagliEsame(Studente studente, int idesame)
         {
 
             var persister = new Persister(connectionString);
-            var idstudente= persister.GetIdStudentByMatricola(matricolastudente);
+            var idstudente= persister.GetIdStudentByMatricola(studente.Matricola);
 
             var esamedettaglio = new EsameDettaglio
             {
@@ -160,6 +111,26 @@ namespace Gestionale
 
 
             return persister.AddExamDetails(esamedettaglio);
+
+        }
+
+        public bool InserisciUnaLezione(Insegnante insegnante, Materia materia)
+        {
+
+            var persister = new Persister(connectionString);
+            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
+
+            var lezione = new Lezione
+            {
+
+                IdInsegnante = idinsegnante,
+                IdMateria = idmateria
+
+            };
+
+
+            return persister.AddLesson(lezione);
 
         }
 

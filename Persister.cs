@@ -351,10 +351,10 @@ namespace Gestionale
                             ;
 
             var sql2 = @"SELECT [ExamDetail].[Voto]
- FROM [dbo].[ExamDetail]
-JOIN [Student] ON [Student].[IdStudente] = [ExamDetail].[IdStudent]
-JOIN [Exam] ON [Exam].[IdExam] = [ExamDetail].[IdExam]
-WHERE [ExamDetail].[IdStudent] = 10 AND [ExamDetail].[Voto] IS NULL AND [Exam].[Date] <= CURRENT_TIMESTAMP";
+                        FROM [dbo].[ExamDetail]
+                        JOIN [Student] ON [Student].[IdStudente] = [ExamDetail].[IdStudent]
+                        JOIN [Exam] ON [Exam].[IdExam] = [ExamDetail].[IdExam]
+                        WHERE [ExamDetail].[IdStudent] = 10 AND [ExamDetail].[Voto] IS NULL AND [Exam].[Date] <= CURRENT_TIMESTAMP";
 
 
             using var connection = new SqlConnection(ConnectionString);
@@ -372,6 +372,28 @@ WHERE [ExamDetail].[IdStudent] = 10 AND [ExamDetail].[Voto] IS NULL AND [Exam].[
             }
 
             return result>0;
+        }
+
+        public bool AddLesson (Lezione lezione)
+        {
+
+            var sql = @"
+                        INSERT INTO [dbo].[Lesson]
+                                   ([IdSubject]
+                                   ,[IdTeacher])
+                             VALUES
+                                   (@IdSubject
+                                   ,@IdTeacher)";
+
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@IdSubject", lezione.IdMateria);
+            command.Parameters.AddWithValue("@IdTeacher", lezione.IdInsegnante);
+
+            return command.ExecuteNonQuery() > 0;
         }
     }
 }
