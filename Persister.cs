@@ -111,6 +111,20 @@ namespace Gestionale
             return listResult;
         }
 
+        public bool ControlPerson(Persona person)
+        {
+
+            var controllo = @"SELECT COUNT(*) FROM [dbo].[Person] 
+                            WHERE [Name] ='" + person.Name + "' AND [Surname]='" + person.Surname + "' AND [BirthDay]='" + person.Birthday + "' AND [Gender]='" + person.Gender + "' AND [Address]='" + person.Address + "'";   
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            using var command = new SqlCommand(controllo, connection);
+            var result = Convert.ToInt32(command.ExecuteScalar());
+            return result>0;
+
+        }
+
         public bool AddPerson(Persona person)
         {
             var sql = @"
@@ -127,19 +141,45 @@ namespace Gestionale
                                    ,@Gender
                                    ,@Address)";
 
+            
+
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
+            var control = ControlPerson(person);
+            var result = 0;
+
+            if (control == false) {
+
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Name", person.Name);
+                command.Parameters.AddWithValue("@Surname", person.Surname);
+                command.Parameters.AddWithValue("@BirthDay", person.Birthday);
+                command.Parameters.AddWithValue("@Gender", person.Gender);
+                command.Parameters.AddWithValue("@Address", person.Address);
+                result = command.ExecuteNonQuery();
+
+            }
+
+            return result > 0;
+        }
+
+        public void DeletePerson(Persona person)
+        {
+
+            var sql = @"DELETE FROM [dbo].[Person] 
+                            WHERE [Name] ='" + person.Name + "' AND [Surname]='" + person.Surname + "' AND" +
+                            "[BirthDay]='" + person.Birthday + "' AND [Gender]='" + person.Gender + "' AND [Address]='" + person.Address + "'";
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Name", person.Name);
-            command.Parameters.AddWithValue("@Surname", person.Surname);
-            command.Parameters.AddWithValue("@BirthDay", person.Birthday);
-            command.Parameters.AddWithValue("@Gender", person.Gender);
-            command.Parameters.AddWithValue("@Address", person.Address);
-            return command.ExecuteNonQuery() > 0;
+            command.ExecuteNonQuery();
+
         }
 
         public bool AddStudent(Studente studente)
         {
+
+            var controllo = @"SELECT COUNT(*) FROM [dbo].[Student] WHERE [Matricola] =@Matricola";
 
             var sql = @"
                         INSERT INTO [dbo].[Person]
@@ -166,26 +206,57 @@ namespace Gestionale
                                    ,@IdPerson
                                    ,@DataIscrizione)";
 
+            
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
+            using var control = new SqlCommand(controllo, connection);
+            control.Parameters.AddWithValue("@Matricola", studente.Matricola);
+            var result = 0;
+
+            if (Convert.ToInt32(control.ExecuteScalar()) > 0)
+            {
+
+                result = 0;
+
+            }
+
+            else {
+
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Name", studente.Name);
+                command.Parameters.AddWithValue("@Surname", studente.Surname);
+                command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
+                command.Parameters.AddWithValue("@Gender", studente.Gender);
+                command.Parameters.AddWithValue("@Address", studente.Address);
+
+                var idperson = Convert.ToInt32(command.ExecuteScalar());
+
+
+                using var command2 = new SqlCommand(sql2, connection);
+
+
+                command2.Parameters.AddWithValue("@Matricola", studente.Matricola);
+                command2.Parameters.AddWithValue("@IdPerson", idperson);
+                command2.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
+
+                result = command2.ExecuteNonQuery();
+
+            }
+
+            return result>0;
+        }
+
+        public void DeleteStudent(Studente studente)
+        {
+
+            var sql = @"DELETE FROM [dbo].[Student] WHERE [Matricola]=@Matricola";
+            using var connection = new SqlConnection(ConnectionString);
+            connection.Open();
             using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Name", studente.Name);
-            command.Parameters.AddWithValue("@Surname", studente.Surname);
-            command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
-            command.Parameters.AddWithValue("@Gender", studente.Gender);
-            command.Parameters.AddWithValue("@Address", studente.Address);
+            command.Parameters.AddWithValue("@Matricola", studente.Matricola);
+            command.ExecuteNonQuery();
 
-            var idperson = Convert.ToInt32(command.ExecuteScalar());
-
-
-            using var command2 = new SqlCommand(sql2, connection);
-            
-
-            command2.Parameters.AddWithValue("@Matricola", studente.Matricola);
-            command2.Parameters.AddWithValue("@IdPerson", idperson);
-            command2.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
-            return command2.ExecuteNonQuery() > 0;
         }
 
         public int GetIdTeachersByMatricola(int matricola)

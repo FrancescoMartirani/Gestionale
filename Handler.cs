@@ -48,12 +48,29 @@ namespace Gestionale
 
         }
 
+        public void CancellaUnaPersona(Persona persona)
+        {
+
+            var persister = new Persister(connectionString);
+            persister.DeletePerson(persona);
+
+        }
+
         public bool InserisciUnoStudente(Studente studente)
         {
             
 
             var persister = new Persister(connectionString);
             return persister.AddStudent(studente);
+
+        }
+
+        public void CancellaUnoStudente(Studente studente)
+        {
+
+
+            var persister = new Persister(connectionString);
+             persister.DeleteStudent(studente);
 
         }
 
