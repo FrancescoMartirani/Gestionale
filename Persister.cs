@@ -17,27 +17,27 @@ namespace Gestionale
             ConnectionString = connectionString;
         }
 
-        public String GetStudentsNameByMatricola(int matricola)
+        public string GetStudentsNameByMatricola(string matricola)
         {
-
             var sql = @"
                     SELECT [Name]
                           ,[Surname]
                       FROM [dbo].[Person]
                         JOIN [dbo].[Student] ON [dbo].[Student].IdPerson = [dbo].[Person].Id
-                    WHERE [Matricola] = "+matricola;
+                    WHERE [Matricola] = @matricola ";
 
             var result = new String("");
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@matricola", matricola);
             var reader = command.ExecuteReader();
 
             while (reader.Read())
             {
 
 
-                result = reader["Name"].ToString() + " " + reader["Surname"].ToString();
+                result = $"{reader["Name"]} {reader["Surname"].ToString()}";
 
             }
 
@@ -55,7 +55,7 @@ namespace Gestionale
                         JOIN [dbo].[Teacher] ON [dbo].[Teacher].IdPerson = [dbo].[Person].Id
                     WHERE [Matricola] = " + matricola;
 
-            var result = new String("");
+            var result = string.Empty;
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
@@ -71,7 +71,7 @@ namespace Gestionale
             return result;
 
         }
-        public List <Persona> GetPeople()
+        public List<Persona> GetPeople()
         {
 
             var sql = @"
@@ -115,13 +115,13 @@ namespace Gestionale
         {
 
             var controllo = @"SELECT COUNT(*) FROM [dbo].[Person] 
-                            WHERE [Name] ='" + person.Name + "' AND [Surname]='" + person.Surname + "' AND [BirthDay]='" + person.Birthday + "' AND [Gender]='" + person.Gender + "' AND [Address]='" + person.Address + "'";   
+                            WHERE [Name] ='" + person.Name + "' AND [Surname]='" + person.Surname + "' AND [BirthDay]='" + person.Birthday + "' AND [Gender]='" + person.Gender + "' AND [Address]='" + person.Address + "'";
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(controllo, connection);
             var result = Convert.ToInt32(command.ExecuteScalar());
-            return result>0;
+            return result > 0;
 
         }
 
@@ -141,14 +141,14 @@ namespace Gestionale
                                    ,@Gender
                                    ,@Address)";
 
-            
+
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
-            var control = ControlPerson(person);
             var result = 0;
 
-            if (control == false) {
+            if (!ControlPerson(person))
+            {
 
                 using var command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@Name", person.Name);
@@ -181,7 +181,7 @@ namespace Gestionale
 
             var controllo = @"SELECT COUNT(*) FROM [dbo].[Student] WHERE [Matricola] =@Matricola";
 
-            var sql = @"
+            var sqlPerson = @"
                         INSERT INTO [dbo].[Person]
                                    ([Name]
                                    ,[Surname]
@@ -196,7 +196,7 @@ namespace Gestionale
                                    ,@Gender
                                    ,@Address)";
 
-            var sql2 = @"
+            var sqlStudent = @"
                         INSERT INTO [dbo].[Student]
                                    ([Matricola]
                                     ,[IdPerson]
@@ -206,7 +206,7 @@ namespace Gestionale
                                    ,@IdPerson
                                    ,@DataIscrizione)";
 
-            
+
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
@@ -217,41 +217,48 @@ namespace Gestionale
             if (Convert.ToInt32(control.ExecuteScalar()) > 0)
             {
 
-                result = 0;
+                return false;
 
             }
 
-            else {
-
-                using var command = new SqlCommand(sql, connection);
-
-                if (ControlPerson(studente) == false)
-                {
-
-                    
-                    command.Parameters.AddWithValue("@Name", studente.Name);
-                    command.Parameters.AddWithValue("@Surname", studente.Surname);
-                    command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
-                    command.Parameters.AddWithValue("@Gender", studente.Gender);
-                    command.Parameters.AddWithValue("@Address", studente.Address);
-                }
 
 
-                var idperson = Convert.ToInt32(command.ExecuteScalar());
+
+            if (!ControlPerson(studente))
+            {
+                using var commandPerson = new SqlCommand(sqlPerson, connection);
+
+                commandPerson.Parameters.AddWithValue("@Name", studente.Name);
+                commandPerson.Parameters.AddWithValue("@Surname", studente.Surname);
+                commandPerson.Parameters.AddWithValue("@BirthDay", studente.Birthday);
+                commandPerson.Parameters.AddWithValue("@Gender", studente.Gender);
+                commandPerson.Parameters.AddWithValue("@Address", studente.Address);
 
 
-                using var command2 = new SqlCommand(sql2, connection);
 
+                var idperson = Convert.ToInt32(commandPerson.ExecuteScalar());
 
-                command2.Parameters.AddWithValue("@Matricola", studente.Matricola);
-                command2.Parameters.AddWithValue("@IdPerson", idperson);
-                command2.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
-
-                result = command2.ExecuteNonQuery();
-
+                if (idperson < 1)
+                    return false;
+                studente.Id = idperson;
+            }
+            else
+            { 
+                //TODO
             }
 
-            return result>0;
+
+          
+
+
+            using var commandStudent = new SqlCommand(sqlStudent, connection);
+
+
+            commandStudent.Parameters.AddWithValue("@Matricola", studente.Matricola);
+            commandStudent.Parameters.AddWithValue("@IdPerson", studente.Id);
+            commandStudent.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
+
+            return commandStudent.ExecuteNonQuery() > 0;
         }
 
         public void DeleteStudent(Studente studente)
@@ -272,7 +279,7 @@ namespace Gestionale
             var sql = @"
                     SELECT [IdTeacher]
                       FROM [dbo].[Teacher]
-                       WHERE [Matricola] ="+matricola;
+                       WHERE [Matricola] =" + matricola;
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
@@ -305,7 +312,7 @@ namespace Gestionale
                     SELECT [IdExam]
                       FROM [dbo].[Exam]
                        JOIN [Subject] ON [Subject].[IdSubject] = [Exam].[IdSubject]
-                       WHERE [Exam].[Date] ='" + dataesame + "'AND [Subject].[Name]='"+nomemateriaesame+"'";
+                       WHERE [Exam].[Date] ='" + dataesame + "'AND [Subject].[Name]='" + nomemateriaesame + "'";
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
@@ -321,7 +328,7 @@ namespace Gestionale
             var sql = @"
                     SELECT [IdSubject]
                       FROM [dbo].[Subject]
-                       WHERE [Name] ='"+nomemateria+"'";
+                       WHERE [Name] ='" + nomemateria + "'";
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
@@ -447,7 +454,7 @@ namespace Gestionale
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
-            
+
             command.Parameters.AddWithValue("@IdStudent", esamedettaglio.IdStudente);
             command.Parameters.AddWithValue("@IdExam", esamedettaglio.IdEsame);
 
@@ -461,7 +468,7 @@ namespace Gestionale
                             UPDATE [dbo].[ExamDetail]
                              SET [Voto] = @Voto
                             WHERE [ExamDetail].[IdStudent] =" + this.GetIdStudentByMatricola(matricola);
-                            ;
+            ;
 
             var sql2 = @"SELECT [ExamDetail].[Voto]
                         FROM [dbo].[ExamDetail]
@@ -484,10 +491,10 @@ namespace Gestionale
 
             }
 
-            return result>0;
+            return result > 0;
         }
 
-        public bool AddLesson (Lezione lezione)
+        public bool AddLesson(Lezione lezione)
         {
 
             var sql = @"
