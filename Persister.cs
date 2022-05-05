@@ -224,11 +224,18 @@ namespace Gestionale
             else {
 
                 using var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Name", studente.Name);
-                command.Parameters.AddWithValue("@Surname", studente.Surname);
-                command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
-                command.Parameters.AddWithValue("@Gender", studente.Gender);
-                command.Parameters.AddWithValue("@Address", studente.Address);
+
+                if (ControlPerson(studente) == false)
+                {
+
+                    
+                    command.Parameters.AddWithValue("@Name", studente.Name);
+                    command.Parameters.AddWithValue("@Surname", studente.Surname);
+                    command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
+                    command.Parameters.AddWithValue("@Gender", studente.Gender);
+                    command.Parameters.AddWithValue("@Address", studente.Address);
+                }
+
 
                 var idperson = Convert.ToInt32(command.ExecuteScalar());
 
