@@ -14,28 +14,28 @@ namespace Gestionale
 
         public List<Persona> GetPersone()
         {
-            var persister = new Persister(connectionString);
+            var persister = new PersisterGetter(connectionString);
             var listPerson = persister.GetPeople();
             return listPerson;
         }
 
-        public String GetNomeStudenteConMatricola(int matricola)
+        public String GetNomeStudenteConMatricola(string matricola)
         {
-            var persister = new Persister(connectionString);
+            var persister = new PersisterGetter(connectionString);
             var result = persister.GetStudentsNameByMatricola(matricola);
             return result;
         }
 
-        public String GetNomeInsegnanteConMatricola(int matricola)
+        public String GetNomeInsegnanteConMatricola(string matricola)
         {
-            var persister = new Persister(connectionString);
+            var persister = new PersisterGetter(connectionString);
             var result = persister.GetTeachersNameByMatricola(matricola);
             return result;
         }
 
         public int GetIdEsameConDataENome(DateTime data, string nomemateria)
         {
-            var persister = new Persister(connectionString);
+            var persister = new PersisterGetter(connectionString);
             var result = persister.GetIdExamByDateAndName(data, nomemateria);
             return result;
         }
@@ -43,7 +43,7 @@ namespace Gestionale
         public bool InserisciUnaPersona(Persona persona)
         {
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterAdder(connectionString);
             return persister.AddPerson(persona);
 
         }
@@ -51,7 +51,7 @@ namespace Gestionale
         public void CancellaUnaPersona(Persona persona)
         {
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterDelete(connectionString);
             persister.DeletePerson(persona);
 
         }
@@ -60,7 +60,7 @@ namespace Gestionale
         {
             
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterAdder(connectionString);
             return persister.AddStudent(studente);
 
         }
@@ -69,7 +69,7 @@ namespace Gestionale
         {
 
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterDelete(connectionString);
              persister.DeleteStudent(studente);
 
         }
@@ -77,7 +77,7 @@ namespace Gestionale
         public bool InserisciUnInsegnante(Insegnante insegnante)
         {
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterAdder(connectionString);
             return persister.AddTeacher(insegnante);
 
         }
@@ -86,7 +86,7 @@ namespace Gestionale
         {
             
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterAdder(connectionString);
             return persister.AddSubject(materia);
 
         }
@@ -94,9 +94,10 @@ namespace Gestionale
         public bool InserisciUnEsame(Esame esame, Insegnante insegnante, Materia materia)
         {
 
-            var persister = new Persister(connectionString);
-            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
-            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
+            var persisterGetter = new PersisterGetter(connectionString);
+            var persisterAdder = new PersisterAdder(connectionString);
+            var idinsegnante = persisterGetter.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persisterGetter.GetIdSubjectsBySubjectsName(materia.NomeMateria);
 
             var esamedainserire = new Esame
             {
@@ -108,15 +109,16 @@ namespace Gestionale
             };
 
             
-            return persister.AddExam(esamedainserire);
+            return persisterAdder.AddExam(esamedainserire);
 
         }
 
         public bool InserisciDettagliEsame(Studente studente, int idesame)
         {
 
-            var persister = new Persister(connectionString);
-            var idstudente= persister.GetIdStudentByMatricola(studente.Matricola);
+            var persisteradder = new PersisterAdder(connectionString);
+            var persistergetter = new PersisterGetter(connectionString);
+            var idstudente= persistergetter.GetIdStudentByMatricola(studente.Matricola);
 
             var esamedettaglio = new EsameDettaglio
             {
@@ -127,16 +129,17 @@ namespace Gestionale
             };
 
 
-            return persister.AddExamDetails(esamedettaglio);
+            return persisteradder.AddExamDetails(esamedettaglio);
 
         }
 
         public bool InserisciUnaLezione(Insegnante insegnante, Materia materia)
         {
 
-            var persister = new Persister(connectionString);
-            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
-            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
+            var persisteradder = new PersisterAdder(connectionString);
+            var persistergetter = new PersisterGetter(connectionString);
+            var idinsegnante = persistergetter.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persistergetter.GetIdSubjectsBySubjectsName(materia.NomeMateria);
 
             var lezione = new Lezione
             {
@@ -147,16 +150,17 @@ namespace Gestionale
             };
 
 
-            return persister.AddLesson(lezione);
+            return persisteradder.AddLesson(lezione);
 
         }
 
         public bool InserisciUnaClasse(Insegnante insegnante, Materia materia)
         {
 
-            var persister = new Persister(connectionString);
-            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
-            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
+            var persisteradder = new PersisterAdder(connectionString);
+            var persistergetter = new PersisterGetter(connectionString);
+            var idinsegnante = persistergetter.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persistergetter.GetIdSubjectsBySubjectsName(materia.NomeMateria);
 
             var lezione = new Lezione
             {
@@ -167,14 +171,14 @@ namespace Gestionale
             };
 
 
-            return persister.AddLesson(lezione);
+            return persisteradder.AddLesson(lezione);
 
         }
 
-        public bool AggiungiVoto(int matricolastudente, int voto)
+        public bool AggiungiVoto(string matricolastudente, int voto)
         {
 
-            var persister = new Persister(connectionString);
+            var persister = new PersisterAdder(connectionString);
 
 
             return persister.AddVoto(matricolastudente, voto);
