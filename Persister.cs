@@ -37,7 +37,7 @@ namespace Gestionale
             {
 
 
-                result = reader["Name"].ToString() + reader["Surname"].ToString();
+                result = reader["Name"].ToString() + " " + reader["Surname"].ToString();
 
             }
 
@@ -64,7 +64,7 @@ namespace Gestionale
             while (reader.Read())
             {
 
-                result = reader["Name"].ToString() + reader["Surname"].ToString();
+                result = reader["Name"].ToString() + " " + reader["Surname"].ToString();
 
             }
 
@@ -142,6 +142,21 @@ namespace Gestionale
         {
 
             var sql = @"
+                        INSERT INTO [dbo].[Person]
+                                   ([Name]
+                                   ,[Surname]
+                                   ,[BirthDay]
+                                   ,[Gender]
+                                   ,[Address])
+                            OUTPUT Inserted.ID
+                             VALUES
+                                   (@Name
+                                   ,@Surname
+                                   ,@BirthDay
+                                   ,@Gender
+                                   ,@Address)";
+
+            var sql2 = @"
                         INSERT INTO [dbo].[Student]
                                    ([Matricola]
                                     ,[IdPerson]
@@ -151,22 +166,26 @@ namespace Gestionale
                                    ,@IdPerson
                                    ,@DataIscrizione)";
 
-            var sql2 = @"
-                    SELECT MAX([Id])
-                      FROM [dbo].[Person]";
-
-            
 
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
-            using var command2 = new SqlCommand(sql2, connection);
-            var idperson = Convert.ToInt32(command2.ExecuteScalar());
+            command.Parameters.AddWithValue("@Name", studente.Name);
+            command.Parameters.AddWithValue("@Surname", studente.Surname);
+            command.Parameters.AddWithValue("@BirthDay", studente.Birthday);
+            command.Parameters.AddWithValue("@Gender", studente.Gender);
+            command.Parameters.AddWithValue("@Address", studente.Address);
 
-            command.Parameters.AddWithValue("@Matricola", studente.Matricola);
-            command.Parameters.AddWithValue("@IdPerson", idperson);
-            command.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
-            return command.ExecuteNonQuery() > 0;
+            var idperson = Convert.ToInt32(command.ExecuteScalar());
+
+
+            using var command2 = new SqlCommand(sql2, connection);
+            
+
+            command2.Parameters.AddWithValue("@Matricola", studente.Matricola);
+            command2.Parameters.AddWithValue("@IdPerson", idperson);
+            command2.Parameters.AddWithValue("@DataIscrizione", studente.DataIscrizione);
+            return command2.ExecuteNonQuery() > 0;
         }
 
         public int GetIdTeachersByMatricola(int matricola)
@@ -238,6 +257,21 @@ namespace Gestionale
         {
 
             var sql = @"
+                        INSERT INTO [dbo].[Person]
+                                   ([Name]
+                                   ,[Surname]
+                                   ,[BirthDay]
+                                   ,[Gender]
+                                   ,[Address])
+                            OUTPUT Inserted.ID
+                             VALUES
+                                   (@Name
+                                   ,@Surname
+                                   ,@BirthDay
+                                   ,@Gender
+                                   ,@Address)";
+
+            var sql2 = @"
                         INSERT INTO [dbo].[Teacher]
                                    ([Matricola]
                                     ,[IdPerson]
@@ -247,22 +281,23 @@ namespace Gestionale
                                    ,@IdPerson
                                    ,@DataAssunzione)";
 
-            var sql2 = @"
-                    SELECT MAX([Id])
-                      FROM [dbo].[Person]";
-
-
-
             using var connection = new SqlConnection(ConnectionString);
             connection.Open();
             using var command = new SqlCommand(sql, connection);
-            using var command2 = new SqlCommand(sql2, connection);
-            var idperson = Convert.ToInt32(command2.ExecuteScalar());
 
-            command.Parameters.AddWithValue("@Matricola", insegnante.Matricola);
-            command.Parameters.AddWithValue("@IdPerson", idperson);
-            command.Parameters.AddWithValue("@DataAssunzione", insegnante.DataAssunzione);
-            return command.ExecuteNonQuery() > 0;
+            command.Parameters.AddWithValue("@Name", insegnante.Name);
+            command.Parameters.AddWithValue("@Surname", insegnante.Surname);
+            command.Parameters.AddWithValue("@BirthDay", insegnante.Birthday);
+            command.Parameters.AddWithValue("@Gender", insegnante.Gender);
+            command.Parameters.AddWithValue("@Address", insegnante.Address);
+
+            var idperson = Convert.ToInt32(command.ExecuteScalar());
+
+            using var command2 = new SqlCommand(sql2, connection);
+            command2.Parameters.AddWithValue("@Matricola", insegnante.Matricola);
+            command2.Parameters.AddWithValue("@IdPerson", idperson);
+            command2.Parameters.AddWithValue("@DataAssunzione", insegnante.DataAssunzione);
+            return command2.ExecuteNonQuery() > 0;
         }
 
         public bool AddSubject(Materia materia)

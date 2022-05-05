@@ -53,7 +53,7 @@ namespace Gestionale
             
 
             var persister = new Persister(connectionString);
-            return persister.AddPerson(studente) && persister.AddStudent(studente);
+            return persister.AddStudent(studente);
 
         }
 
@@ -61,7 +61,7 @@ namespace Gestionale
         {
 
             var persister = new Persister(connectionString);
-            return persister.AddPerson(insegnante) && persister.AddTeacher(insegnante);
+            return persister.AddTeacher(insegnante);
 
         }
 
@@ -115,6 +115,26 @@ namespace Gestionale
         }
 
         public bool InserisciUnaLezione(Insegnante insegnante, Materia materia)
+        {
+
+            var persister = new Persister(connectionString);
+            var idinsegnante = persister.GetIdTeachersByMatricola(insegnante.Matricola);
+            var idmateria = persister.GetIdSubjectsBySubjectsName(materia.NomeMateria);
+
+            var lezione = new Lezione
+            {
+
+                IdInsegnante = idinsegnante,
+                IdMateria = idmateria
+
+            };
+
+
+            return persister.AddLesson(lezione);
+
+        }
+
+        public bool InserisciUnaClasse(Insegnante insegnante, Materia materia)
         {
 
             var persister = new Persister(connectionString);
